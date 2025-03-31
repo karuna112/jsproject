@@ -1,0 +1,30 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": { "name": "New Delhi, India" },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.2090, 28.6139]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": { "name": "Beijing, China" },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [116.4074, 39.9042]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": { "name": "Washington, D.C., USA" },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-77.0369, 38.9072]
+        }
+      }
+    ]
+  }
+  

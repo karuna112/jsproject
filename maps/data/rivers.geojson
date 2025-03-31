@@ -1,0 +1,30 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": { "name": "Nile River" },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [31.2357, 30.0444],   
+            [32.5599, 15.5007],  
+            [29.9189, 0.3476]     
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": { "name": "Amazon River" },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [-70.6693, -4.2263],   
+            [-60.0258, -3.1072],   
+            [-51.9253, -1.4558]    
+          ]
+        }
+      }
+    ]
+  }
+  

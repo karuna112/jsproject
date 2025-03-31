@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="addElem()">Add Element</button>
+    <button onclick="showElem()">See Elements</button>
+    
+    <script>
+        var arr = [1,2,3,4,5];
+        var len_arr = arr.length;
+
+        function showElem(){
+            for(var i=0; i<len_arr;i++){
+                console.log(arr[i]+" ");
+            }
+        }
+
+    
+        function addElem(ele){
+            arr.push(6);
+            return arr;
+        }
+    </script>
+</body>
+</html>

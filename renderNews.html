@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markdown Viewer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <style>
+    @font-face {
+      font-family: 'Open Dyslexic';
+      src: url('./fonts/OpenDyslexic-Regular.woff2') format('woff2'),
+           url('./fonts/OpenDyslexic-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #1e1e1e;
+      --bg-sepia: #f4ecd8;
+      --text-light: #333;
+      --text-dark: #f4f4f4;
+      --text-sepia: #5b4636;
+      --accent-light: #007bff;
+      --accent-dark: #1f77ff;
+      --accent-sepia: #b5651d;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Georgia, 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+    body.dyslexic-font {
+      font-family: 'Open Dyslexic', 'Arial', sans-serif;
+    }
+    body.dark-mode { background: var(--bg-dark); color: var(--text-dark); }
+    body.sepia-mode { background: var(--bg-sepia); color: var(--text-sepia); }
+    h1, h2, h3 { color: var(--accent-light); }
+    body.dark-mode h1, body.dark-mode h2, body.dark-mode h3 { color: var(--accent-dark); }
+    body.sepia-mode h1, body.sepia-mode h2, body.sepia-mode h3 { color: var(--accent-sepia); }
+    a { color: var(--accent-light); text-decoration: none; }
+
+    #topBar {
+      height: 50px;
+      background-color: var(--bg-light);
+      border-bottom: 1px solid var(--accent-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+    }
+    #topBar span { font-weight: bold; font-size: 16px; }
+
+    #markdownContent {
+      padding: 30px 50px;
+    }
+    #markdownContent img {
+      max-width: 90%;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      display: block;
+      overflow-x: auto;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .settings-popup {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 3000;
+        display: none;
+        width: 250px;               /* 👈 NEW */
+        overflow: hidden;           /* 👈 NEW */
+        font-size: 14px !important;
+    }
+
+    .settings-popup select, .settings-popup input[type='range'] {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 5px;
+    }
+    .highlight {
+      background-color: yellow;
+    }
+    .settings-icon {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settings-icon:hover {
+  transform: scale(1.1);
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+}
+.settings-popup {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 260px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  z-index: 3000;
+  display: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.settings-popup label {
+  margin-top: 12px;
+  font-weight: 600;
+  display: block;
+}
+
+.settings-popup select,
+.settings-popup input[type='range'] {
+  width: 100%;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+.settings-popup select:focus,
+.settings-popup input[type='range']:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.settings-popup button {
+  width: 100%;
+  padding: 8px 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.settings-popup button:hover {
+  background: #0056b3;
+}
+
+  </style>
+</head>
+<body>
+  <div id="topBar">
+    <!-- <button onclick="speakFromCurrent()">🔊</button> -->
+    <span>Markdown Viewer</span>
+    <button class="settings-icon" onclick="toggleSettings()">⚙️</button>
+  </div>
+
+  <div id="markdownContent"></div>
+
+  <div class="settings-popup" id="settingsPopup">
+    <label><strong>Font:</strong></label>
+    <select id="fontSelector" onchange="changeFont()">
+      <option value="Georgia">Georgia</option>
+      <option value="'Segoe UI', sans-serif">Segoe UI</option>
+      <option value="Roboto, sans-serif">Roboto</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="'Times New Roman', serif">Times New Roman</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="OpenDyslexic">Open Dyslexic</option>
+    </select>
+    <label><strong>Font Size:</strong></label>
+    <input type="range" id="fontSizeSlider" min="14" max="24" value="16" onchange="changeFontSize(this.value)" />
+    <label><strong>Theme:</strong></label>
+    <select onchange="manualThemeChange(this.value)">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="sepia">Sepia</option>
+    </select>
+    <label><strong>Translate:</strong></label>
+    <div id="google_translate_element"></div>
+  </div>
+
+  <script>
+    let synth = window.speechSynthesis;
+    let utterance;
+
+    function toggleSettings() {
+      const popup = document.getElementById('settingsPopup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.addEventListener("click", function (event) {
+  const popup = document.getElementById("settingsPopup");
+  const settingsBtn = document.querySelector(".settings-icon");
+
+  // If clicked outside the popup and not on the settings button
+  if (
+    popup.style.display === "block" &&
+    !popup.contains(event.target) &&
+    !settingsBtn.contains(event.target)
+  ) {
+    popup.style.display = "none";
+  }
+});
+
+    function changeFont() {
+      const font = document.getElementById("fontSelector").value;
+      if (font === 'OpenDyslexic') {
+        document.body.classList.add('dyslexic-font');
+      } else {
+        document.body.classList.remove('dyslexic-font');
+        document.body.style.fontFamily = font;
+      }
+    }
+    function changeFontSize(size) {
+      document.body.style.fontSize = size + "px";
+    }
+    function manualThemeChange(theme) {
+      document.body.classList.remove('dark-mode', 'sepia-mode');
+      if (theme === 'dark') document.body.classList.add('dark-mode');
+      else if (theme === 'sepia') document.body.classList.add('sepia-mode');
+    }
+    function speakFromCurrent() {
+      stopSpeaking();
+      const text = document.getElementById("markdownContent").innerText;
+      utterance = new SpeechSynthesisUtterance(text);
+      synth.speak(utterance);
+    }
+    function stopSpeaking() {
+      if (synth.speaking) synth.cancel();
+      document.querySelectorAll(".highlight").forEach(n => n.classList.remove("highlight"));
+    }
+    function pauseReading() {
+      if (synth.speaking) synth.pause();
+    }
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+    }
+    async function loadMarkdown() {
+      const url = "https://raw.githubusercontent.com/GitKaran4723/dailynews/refs/heads/main/2025/mar/30.md";
+      const res = await fetch(url);
+      const md = await res.text();
+      const html = marked.parse(md);
+      document.getElementById("markdownContent").innerHTML = html;
+      if (window.MathJax) MathJax.typeset();
+      Prism.highlightAll();
+    }
+    window.onload = () => {
+      loadMarkdown();
+    };
+  </script>
+</body>
+</html>

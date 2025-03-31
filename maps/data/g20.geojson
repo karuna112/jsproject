@@ -1,0 +1,26 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "India"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [77.209, 28.6139]
+        }
+      },
+      {
+        "type": "Feature",
+        "properties": {
+          "name": "United States"
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [-77.0369, 38.9072]
+        }
+      }
+    ]
+  }
+  
